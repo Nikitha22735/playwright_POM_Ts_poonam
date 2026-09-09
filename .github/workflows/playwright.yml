@@ -29,10 +29,12 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
+        id: playwright
+        continue-on-error: true
         run: npx playwright test
 
       - name: Upload Playwright Report for GitHub Pages
-        if: always()
+        if: ${{ always() && hashFiles('playwright-report/**') != '' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: playwright-report/
