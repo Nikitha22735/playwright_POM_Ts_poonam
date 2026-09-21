@@ -3,65 +3,70 @@ name: Playwright Tests
 on:
   push:
     branches: [ main ]
+
   pull_request:
     branches: [ main ]
 
-# Required for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
 jobs:
+
   test:
     name: Run Playwright Tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the repository
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: npm
 
-      # 3. Install npm dependencies
       - name: Install dependencies
         run: npm ci
 
-      # 4. Install Playwright browsers
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # 5. Run Playwright tests
       - name: Run Playwright tests
         run: npx playwright test
 
-      # 6. Upload Playwright HTML report
+      # Make sure report exists
+      - name: Check Playwright Report
+        if: ${{ !cancelled() }}
+        run: |
+          echo "Checking Playwright report..."
+          ls -la playwright-report/
+          test -f playwright-report/index.html
+
       - name: Upload Playwright Report
         if: ${{ !cancelled() }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: playwright-report/
 
-  # Separate job to deploy the report
   deploy:
     name: Deploy Playwright Report
     needs: test
     runs-on: ubuntu-latest
 
-    # GitHub Pages environment
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      # 7. Deploy report to GitHub Pages
-      - name: Deploy to GitHub Pages
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy Playwright Report
         id: deployment
         uses: actions/deploy-pages@v4
