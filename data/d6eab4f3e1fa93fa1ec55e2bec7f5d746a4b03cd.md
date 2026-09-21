@@ -1,0 +1,72 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: home.spec.ts >> verify home page 2 @e2e11
+- Location: tests/home.spec.ts:15:5
+
+# Error details
+
+```
+Error: expect(page).toHaveTitle(expected) failed
+
+Expected: "Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in"
+Received: "Amazon.in"
+Timeout:  5000ms
+
+Call log:
+  - Expect "toHaveTitle" with timeout 5000ms
+    14 × locator resolved to <html lang="en-us" class="a-no-js">…</html>
+       - unexpected value "Amazon.in"
+
+```
+
+```yaml
+- heading "Click the button below to continue shopping" [level=4]
+- button "Continue shopping"
+- link "Conditions of Use & Sale":
+  - /url: https://www.amazon.in/gp/help/customer/display.html/ref=footer_cou?ie=UTF8&nodeId=200545940
+- link "Privacy Notice":
+  - /url: https://www.amazon.in/gp/help/customer/display.html/ref=footer_privacy?ie=UTF8&nodeId=200534380
+- text: © 1996-2025, Amazon.com, Inc. or its affiliates
+```
+
+# Test source
+
+```ts
+  1  | import {expect, test} from "@playwright/test";
+  2  | import { homePage } from "../pages/homePage"
+  3  | 
+  4  | test('verify home page @e2e11', async ({ page })=>{
+  5  |     await page.goto("https://www.amazon.in/")
+  6  |     await expect(page).toHaveTitle("Online Shopping site in India: Shop Online11 for Mobiles, Books, Watches, Shoes and More - Amazon.in")
+  7  |     const homePageObj = new homePage(page)
+  8  |     await homePageObj.validateTheVisibilityOfAmazonLogo()
+  9  |     await homePageObj.validateTheVisibilityOfSearchbar()
+  10 | })
+  11 | 
+  12 | 
+  13 | 
+  14 | 
+  15 | test('verify home page 2 @e2e11', async ({ page })=>{
+  16 |     await page.goto("https://www.amazon.in/")
+> 17 |     await expect(page).toHaveTitle("Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in")
+     |                        ^ Error: expect(page).toHaveTitle(expected) failed
+  18 |     const homePageObj = new homePage(page)
+  19 |     homePageObj.validateTheVisibilityOfAmazonLogo()
+  20 |     homePageObj.validateTheVisibilityOfSearchbar()
+  21 | })
+  22 | 
+  23 | 
+  24 | test('verify home page 3', async ({ page })=>{
+  25 |     await page.goto("https://www.amazon.in/")
+  26 |     await expect(page).toHaveTitle("Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in")
+  27 |     const homePageObj = new homePage(page)
+  28 |     homePageObj.validateTheVisibilityOfAmazonLogo()
+  29 |     homePageObj.validateTheVisibilityOfSearchbar()
+  30 | })
+```
